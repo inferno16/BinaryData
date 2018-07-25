@@ -88,7 +88,7 @@ void Binary::PrependData(const byte_t * data, const size_t &size)
 uint32_t Binary::GetBits(const size_t & count)
 {
 	if (count > 32 || BufferSufficient(count)) {
-		// Error
+		throw "GetBits can't retrieve more than 32 bits (4 bytes) at once!\n";
 	}
 	size_t bitCount;
 	uint32_t bits = GetAvailableBitsFromCurrentByte(bitCount);
