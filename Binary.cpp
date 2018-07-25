@@ -100,7 +100,7 @@ uint32_t Binary::GetBits(const size_t & count)
 	if (bitCount == count)
 		PopByte();
 	bits = (bits >> m_nUsedBits) & ((1 << count) - 1);
-	m_nUsedBits = count % 8;
+	m_nUsedBits += (count + 8 - bitCount) % 8;
 
 	return bits; // If count is 3 and the mask is 0b00000111 or decimal '7' (1 << 3 = 8, 8 - 1 = 7)
 }
