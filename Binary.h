@@ -21,6 +21,10 @@ public:
 	const byte_t* GetRawData() const;
 	size_t GetSize() const;
 
+	// Static functions
+	static uint32_t ByteSwap(const uint32_t &num);
+	static uint16_t ByteSwap(const uint16_t &num);
+
 	// Other public methods
 	void ReadFromStream(std::istream &stream, const size_t &size);
 	void WriteToStream(std::ostream &stream) const;
@@ -30,7 +34,15 @@ public:
 	void PrependData(const binary_t &data);
 	void PrependData(const Binary &bObj);
 	void PrependData(const byte_t* data, const size_t &size);
+	uint32_t GetBits(const size_t &count);
+	void FlushBits();
 
-private:
+private: // Methods
+	bool BufferSufficient(const size_t &bitCount);
+	uint8_t GetAvailableBitsFromCurrentByte(size_t &bitCount);
+	uint8_t PopByte();
+
+private: // Variables
 	binary_t m_vData;
+	uint8_t m_nUsedBits; // number 0-7 representing the used bits from the current byte
 };
