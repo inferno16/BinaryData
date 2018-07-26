@@ -94,13 +94,14 @@ uint32_t Binary::GetBits(const size_t & count)
 	uint32_t bits = GetAvailableBitsFromCurrentByte(bitCount);
 	while (bitCount < count) {
 		PopByte();
-		bits = (bits << 8) | (uint8_t)m_vData.at(0);
+		uint32_t currByte = (uint32_t)m_vData.at(0);
+		bits |= (currByte << bitCount);
 		bitCount += 8;
 	}
 	if (bitCount == count)
 		PopByte();
-	bits = (bits >> m_nUsedBits) & ((1 << count) - 1);
-	m_nUsedBits += (count + 8 - bitCount) % 8;
+	bits &= ((1 << count) - 1);
+	m_nUsedBits = (m_nUsedBits + count + (8 - bitCount % 8)) % 8;
 
 	return bits; // If count is 3 and the mask is 0b00000111 or decimal '7' (1 << 3 = 8, 8 - 1 = 7)
 }
