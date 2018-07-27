@@ -1,6 +1,7 @@
 #pragma once
 #include <vector>
 #include <iostream>
+#include <sstream>
 
 typedef char byte_t;
 typedef std::vector<byte_t> binary_t;
@@ -36,11 +37,12 @@ public:
 	void PrependData(const byte_t* data, const size_t &size);
 	uint32_t GetBits(const size_t &count);
 	void FlushBits();
+	void ReadData(byte_t* buffer, const size_t &size, bool autoFlush = true);
 
 private: // Methods
 	bool BufferSufficient(const size_t &bitCount);
 	uint8_t GetAvailableBitsFromCurrentByte(size_t &bitCount);
-	uint8_t PopByte();
+	void PopByte();
 
 private: // Variables
 	binary_t m_vData;

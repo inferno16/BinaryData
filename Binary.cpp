@@ -88,7 +88,7 @@ void Binary::PrependData(const byte_t * data, const size_t &size)
 uint32_t Binary::GetBits(const size_t & count)
 {
 	if (count > 32 || !BufferSufficient(count)) {
-		throw "GetBits can't retrieve more than 32 bits (4 bytes) at once!\n";
+		throw "GetBits can't retrieve more than 32 bits (4 bytes) at once!";
 	}
 	size_t bitCount;
 	uint32_t bits = GetAvailableBitsFromCurrentByte(bitCount);
@@ -112,6 +112,19 @@ void Binary::FlushBits()
 		PopByte();
 }
 
+void Binary::ReadData(byte_t* buffer, const size_t & size, bool autoFlush)
+{
+	if (size > m_vData.size())
+		throw "Internal data buffer size is insufficient!";
+	if (autoFlush)
+		FlushBits();
+	
+	std::stringstream ss;
+	ss.write(binary_t(m_vData.begin(), m_vData.begin() + size).data(), size);
+	m_vData.erase(m_vData.begin(), m_vData.begin() + size);
+	ss.read(buffer, size);
+}
+
 bool Binary::BufferSufficient(const size_t &bitCount)
 {
 	return ((m_vData.size() * 8 - m_nUsedBits) >= bitCount);
@@ -126,11 +139,9 @@ uint8_t Binary::GetAvailableBitsFromCurrentByte(size_t &bitCount)
 	return bits;
 }
 
-uint8_t Binary::PopByte()
+void Binary::PopByte()
 {
-	uint8_t byte = m_vData.at(0);
 	m_vData.erase(m_vData.begin());
-	return byte;
 }
 
 uint32_t Binary::ByteSwap(const uint32_t &num)
