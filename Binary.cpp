@@ -43,7 +43,7 @@ size_t Binary::GetSize() const
 void Binary::ReadFromStream(std::istream &stream, const size_t &size)
 {
 	binary_t vec(size);
-	stream.read(vec.data(), size);
+	stream.read((char*)vec.data(), size);
 	int a = stream.rdstate();
 	if (stream.good() || stream.eof()) {
 		m_vData = vec;
@@ -52,7 +52,7 @@ void Binary::ReadFromStream(std::istream &stream, const size_t &size)
 
 void Binary::WriteToStream(std::ostream & stream) const
 {
-	stream.write(m_vData.data(), m_vData.size());
+	stream.write((char*)m_vData.data(), m_vData.size());
 }
 
 void Binary::AppendData(const binary_t & data)
@@ -108,8 +108,10 @@ uint32_t Binary::GetBits(const size_t & count)
 
 void Binary::FlushBits()
 {
-	if (m_nUsedBits > 0)
+	if (m_nUsedBits > 0) {
 		PopByte();
+		m_nUsedBits = 0;
+	}
 }
 
 void Binary::ReadData(byte_t* buffer, const size_t & size, bool autoFlush)
@@ -120,9 +122,9 @@ void Binary::ReadData(byte_t* buffer, const size_t & size, bool autoFlush)
 		FlushBits();
 	
 	std::stringstream ss;
-	ss.write(binary_t(m_vData.begin(), m_vData.begin() + size).data(), size);
+	ss.write((char*)binary_t(m_vData.begin(), m_vData.begin() + size).data(), size);
 	m_vData.erase(m_vData.begin(), m_vData.begin() + size);
-	ss.read(buffer, size);
+	ss.read((char*)buffer, size);
 }
 
 bool Binary::BufferSufficient(const size_t &bitCount)

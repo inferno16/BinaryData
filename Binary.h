@@ -3,7 +3,7 @@
 #include <iostream>
 #include <sstream>
 
-typedef char byte_t;
+typedef unsigned char byte_t;
 typedef std::vector<byte_t> binary_t;
 
 class Binary
