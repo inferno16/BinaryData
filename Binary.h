@@ -1,7 +1,6 @@
 #pragma once
 #include <vector>
 #include <iostream>
-#include <sstream>
 
 typedef unsigned char byte_t;
 typedef std::vector<byte_t> binary_t;

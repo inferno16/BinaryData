@@ -121,10 +121,8 @@ void Binary::ReadData(byte_t* buffer, const size_t & size, bool autoFlush)
 	if (autoFlush)
 		FlushBits();
 	
-	std::stringstream ss;
-	ss.write((char*)binary_t(m_vData.begin(), m_vData.begin() + size).data(), size);
+	memcpy_s((void*)buffer, size, (void*)m_vData.data(), size);
 	m_vData.erase(m_vData.begin(), m_vData.begin() + size);
-	ss.read((char*)buffer, size);
 }
 
 bool Binary::BufferSufficient(const size_t &bitCount)
