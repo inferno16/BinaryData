@@ -1,15 +1,19 @@
 #include "Binary.h"
 
 Binary::Binary()
-	:m_nUsedBits(0)
+	:m_nUsedBits(0), m_nUnusedBits(0)
 {}
 
 Binary::Binary(const binary_t & vec)
-	: m_vData(vec), m_nUsedBits(0)
+	: m_vData(vec), m_nUsedBits(0), m_nUnusedBits(0)
+{}
+
+Binary::Binary(const binary_t::iterator & begin, const binary_t::iterator & end)
+	: m_vData(begin, end), m_nUsedBits(0), m_nUnusedBits(0)
 {}
 
 Binary::Binary(const Binary & bObj)
-	: m_vData(bObj.m_vData), m_nUsedBits(bObj.m_nUsedBits)
+	: m_vData(bObj.m_vData), m_nUsedBits(bObj.m_nUsedBits), m_nUnusedBits(bObj.m_nUnusedBits)
 {}
 
 Binary::~Binary()
@@ -23,6 +27,11 @@ void Binary::SetData(const binary_t & data)
 void Binary::SetData(const byte_t * data, const size_t &size)
 {
 	m_vData.assign(data, data + size);
+}
+
+void Binary::SetData(const binary_t::iterator & begin, const binary_t::iterator & end)
+{
+	m_vData.assign(begin, end);
 }
 
 binary_t Binary::GetData() const
@@ -90,6 +99,9 @@ uint32_t Binary::GetBits(const size_t & count)
 	if (count > 32 || !BufferSufficient(count)) {
 		throw "GetBits can't retrieve more than 32 bits (4 bytes) at once!";
 	}
+	if (count == 0) { // This is always zero, no need to calculate it
+		return 0;
+	}
 	size_t bitCount;
 	uint32_t bits = GetAvailableBitsFromCurrentByte(bitCount);
 	while (bitCount < count) {
@@ -120,9 +132,53 @@ void Binary::ReadData(byte_t* buffer, const size_t & size, bool autoFlush)
 		throw "Internal data buffer size is insufficient!";
 	if (autoFlush)
 		FlushBits();
-	
+
 	memcpy_s((void*)buffer, size, (void*)m_vData.data(), size);
 	m_vData.erase(m_vData.begin(), m_vData.begin() + size);
+}
+
+void Binary::ShiftRight(const size_t & amount)
+{
+	if (amount > m_vData.size() * sizeof(byte_t) * 8) {
+		throw "Amount of bits to shift is greater than the actual bit count!";
+	}
+
+	if (amount >= sizeof(byte_t) * 8) {
+		for (size_t i = 0; i < m_vData.size(); i++)
+		{
+			m_vData.at(i) = (i < m_vData.size() - 1) ? m_vData.at(i + 1) : 0;
+		}
+		ShiftRight(amount - sizeof(byte_t) * 8);
+	}
+	else {
+		for (size_t i = 0; i < m_vData.size(); i++)
+		{
+			m_vData.at(i) = m_vData.at(i) >> amount;
+			m_vData.at(i) |= (i < m_vData.size() - 1) ? (m_vData.at(i + 1) << (sizeof(byte_t) * 8 - amount)) : 0;
+		}
+	}
+}
+
+void Binary::ShiftLeft(const size_t & amount)
+{
+	if (amount > m_vData.size() * sizeof(byte_t) * 8) {
+		throw "Amount of bits to shift is greater than the actual bit count!";
+	}
+
+	if (amount >= sizeof(byte_t) * 8) {
+		for (int i = m_vData.size() - 1; i >= 0; i--)
+		{
+			m_vData.at(i) = (i > 0) ? m_vData.at(i - 1) : 0;
+		}
+		ShiftLeft(amount - sizeof(byte_t) * 8);
+	}
+	else {
+		for (int i = m_vData.size() - 1; i >= 0; i--)
+		{
+			m_vData.at(i) = m_vData.at(i) << amount;
+			m_vData.at(i) |= (i > 0) ? (m_vData.at(i - 1) >> (sizeof(byte_t) * 8 - amount)) : 0;
+		}
+	}
 }
 
 bool Binary::BufferSufficient(const size_t &bitCount)
