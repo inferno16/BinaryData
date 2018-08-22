@@ -96,6 +96,16 @@ void Binary::AppendData(const Binary & bObj)
 	AppendData(bObj.GetRawData(), bObj.GetSize());
 }
 
+void Binary::AppendData(const byte_t * data, const size_t &size)
+{
+	m_vData.insert(m_vData.end(), data, data + size);
+}
+
+void Binary::AppendData(const byte_t byte)
+{
+	AppendData((byte_t*)&byte, 1);
+}
+
 void Binary::AppendData(const binary_t::iterator & begin, const binary_t::iterator & end)
 {
 	AppendData(&*begin, begin - end);
@@ -116,11 +126,6 @@ void Binary::AppendUnalignedData(Binary & bObj)
 	}
 }
 
-void Binary::AppendData(const byte_t * data, const size_t &size)
-{
-	m_vData.insert(m_vData.end(), data, data + size);
-}
-
 void Binary::PrependData(const binary_t & data)
 {
 	PrependData(data.data(), data.size());
@@ -134,6 +139,16 @@ void Binary::PrependData(const Binary & bObj)
 void Binary::PrependData(const byte_t * data, const size_t &size)
 {
 	m_vData.insert(m_vData.begin(), data, data + size);
+}
+
+void Binary::PrependData(const byte_t byte)
+{
+	PrependData((byte_t*)&byte, 1);
+}
+
+void Binary::PrependData(const binary_t::iterator & begin, const binary_t::iterator & end)
+{
+	PrependData(&*begin, end - begin);
 }
 
 uint32_t Binary::GetBits(const size_t & count)
@@ -240,11 +255,11 @@ void Binary::ShiftRight(const size_t & amount, const bool &resize)
 
 void Binary::ShiftLeft(const size_t & amount, const bool &resize)
 {
-	if (amount > m_vData.size() * sizeof(byte_t) * 8) {
+	if (amount > m_vData.size() * 8) {
 		throw "Amount of bits to shift is greater than the actual bit count!";
 	}
 
-	if (amount >= sizeof(byte_t) * 8) {
+	if (amount >= 8) {
 		for (int i = m_vData.size() - 1; i >= 0; i--)
 		{
 			if (i > 0)
@@ -256,13 +271,13 @@ void Binary::ShiftLeft(const size_t & amount, const bool &resize)
 					m_vData.at(i) = 0;
 			}
 		}
-		ShiftLeft(amount - sizeof(byte_t) * 8);
+		ShiftLeft(amount - 8);
 	}
 	else {
 		for (int i = m_vData.size() - 1; i >= 0; i--)
 		{
 			m_vData.at(i) = m_vData.at(i) << amount;
-			m_vData.at(i) |= (i > 0) ? (m_vData.at(i - 1) >> (sizeof(byte_t) * 8 - amount)) : 0;
+			m_vData.at(i) |= (i > 0) ? (m_vData.at(i - 1) >> (8 - amount)) : 0;
 		}
 		if (resize) {
 			if (amount + m_nUsedBits >= 8)

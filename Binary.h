@@ -38,11 +38,14 @@ public:
 	void AppendData(const binary_t &data);
 	void AppendData(const Binary &bObj);
 	void AppendData(const byte_t* data, const size_t &size);
+	void AppendData(const byte_t byte);
 	void AppendData(const binary_t::iterator &begin, const binary_t::iterator &end);
 	void AppendUnalignedData(Binary &bObj);
 	void PrependData(const binary_t &data);
 	void PrependData(const Binary &bObj);
 	void PrependData(const byte_t* data, const size_t &size);
+	void PrependData(const byte_t byte);
+	void PrependData(const binary_t::iterator &begin, const binary_t::iterator &end);
 	uint32_t GetBits(const size_t &count);
 	void FlushBits();
 	void ReadData(byte_t* buffer, const size_t &size, bool autoFlush = true);
