@@ -11,6 +11,7 @@ class Binary
 public:
 	// Constructors and Destructor
 	Binary();
+	Binary(const size_t &size);
 	Binary(const binary_t &vec);
 	Binary(const binary_t::iterator &begin, const binary_t::iterator &end);
 	Binary(const Binary &bObj);
@@ -58,6 +59,8 @@ public:
 	void SwapBitPointers();
 	void PopFront();
 	void PopBack();
+	void ShrinkToFit();
+	void FreeData();
 
 private: // Methods
 	bool BufferSufficient(const size_t &bitCount);
@@ -66,6 +69,7 @@ private: // Methods
 
 private: // Variables
 	binary_t m_vData;
-	uint8_t m_nUsedBits; // number 0-7 representing the used bits from the current byte
-	uint8_t m_nUnusedBits; // Number 0-7 representing the unused bits from the last byte
+	size_t m_uDataOffset;
+	uint8_t m_uUsedBits; // number 0-7 representing the used bits from the current byte
+	uint8_t m_uUnusedBits; // Number 0-7 representing the unused bits from the last byte
 };
